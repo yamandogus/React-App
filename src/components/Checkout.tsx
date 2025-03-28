@@ -377,8 +377,8 @@ const Checkout = () => {
                   <div className="flex-1">
                     <h3 className="text-sm line-clamp-1">{item.title}</h3>
                     <div className="flex justify-between mt-1">
-                      <span className="text-sm text-gray-500">{item.quantity} x {item.price.toFixed(2)} TL</span>
-                      <span className="text-sm font-medium">{(item.price * item.quantity).toFixed(2)} TL</span>
+                      <span className="text-sm text-gray-500">{item.quantity} x {item.price.toFixed(2)} $</span>
+                      <span className="text-sm font-medium">{(item.price * item.quantity).toFixed(2)} $</span>
                     </div>
                   </div>
                 </div>
@@ -388,7 +388,7 @@ const Checkout = () => {
             <div className="border-t pt-4">
               <div className="flex justify-between mb-2">
                 <span>Ara Toplam</span>
-                <span>{totalPrice.toFixed(2)} TL</span>
+                <span>{totalPrice.toFixed(2)} $</span>
               </div>
               <div className="flex justify-between mb-2">
                 <span>Kargo</span>
@@ -396,7 +396,7 @@ const Checkout = () => {
               </div>
               <div className="flex justify-between font-bold text-lg mt-4 pt-4 border-t">
                 <span>Toplam</span>
-                <span>{totalPrice.toFixed(2)} TL</span>
+                <span>{totalPrice.toFixed(2)} $</span>
               </div>
             </div>
           </div>

@@ -41,7 +41,7 @@ const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
                   <img src={item.image} alt={item.title} className="w-16 h-16 object-contain mr-4" />
                   <div className="flex-1">
                     <h3 className="text-sm font-medium line-clamp-2">{item.title}</h3>
-                    <p className="text-gray-700 font-bold mt-1">{item.price.toFixed(2)} TL</p>
+                    <p className="text-gray-700 font-bold mt-1">{item.price.toFixed(2)} $</p>
                     <div className="flex items-center mt-2">
                       <button 
                         onClick={() => dispatch(decreaseQuantity(item.id))}
@@ -77,7 +77,7 @@ const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
         <div className="p-4 border-t">
           <div className="flex justify-between mb-4">
             <span className="font-bold">Toplam:</span>
-            <span className="font-bold">{totalPrice.toFixed(2)} TL</span>
+            <span className="font-bold">{totalPrice.toFixed(2)} $</span>
           </div>
           <Link 
             to="/checkout" 

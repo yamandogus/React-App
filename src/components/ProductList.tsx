@@ -43,7 +43,7 @@ const ProductList = () => {
             </div>
             <div className="p-4">
               <h2 className="text-lg font-semibold mb-2 line-clamp-2 h-14">{product.title}</h2>
-              <p className="text-gray-700 font-bold mb-4">{product.price.toFixed(2)} TL</p>
+              <p className="text-gray-700 font-bold mb-4">{product.price.toFixed(2)} $</p>
               <button 
                 onClick={() => dispatch(addToCart(product))}
                 className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors duration-300"
