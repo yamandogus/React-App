@@ -8,7 +8,8 @@ const Checkout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { cart } = useSelector((state: RootState) => state.product);
-  const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+
+  const totalPrice = Array.isArray(cart) ? cart.reduce((total, item) => total + item.price * item.quantity, 0) : 0;
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -29,28 +30,24 @@ const Checkout = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
+
     if (name === 'cardNumber') {
-      // Sadece rakamları al ve boşlukları kaldır
       const cleaned = value.replace(/\D/g, '');
-      
-      // 16 karakterden fazla olmasını engelle
+
       if (cleaned.length > 16) return;
-      
-      // 4'erli gruplar halinde formatlama
+
       let formatted = '';
       for (let i = 0; i < cleaned.length; i += 4) {
         const chunk = cleaned.slice(i, i + 4);
         formatted += chunk;
         if (i + 4 < cleaned.length) formatted += ' ';
       }
-      
+
       setFormData({
         ...formData,
         [name]: formatted,
       });
     } else if (name === 'cvv') {
-      // Sadece rakamları al ve 3 karakterle sınırla
       const cleaned = value.replace(/\D/g, '');
       if (cleaned.length <= 3) {
         setFormData({
@@ -59,17 +56,14 @@ const Checkout = () => {
         });
       }
     } else if (name === 'expiryDate') {
-      // Sadece rakamları al
       let cleaned = value.replace(/\D/g, '');
-      
-      // 4 karakterden fazla olmasını engelle (AA/YY formatı için)
+
       if (cleaned.length > 4) return;
-      
-      // AA/YY formatında formatlama
+
       if (cleaned.length > 2) {
         cleaned = cleaned.slice(0, 2) + '/' + cleaned.slice(2);
       }
-      
+
       setFormData({
         ...formData,
         [name]: cleaned,
@@ -84,7 +78,7 @@ const Checkout = () => {
 
   const validateStep1 = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.firstName.trim()) newErrors.firstName = 'Ad alanı zorunludur';
     if (!formData.lastName.trim()) newErrors.lastName = 'Soyad alanı zorunludur';
     if (!formData.email.trim()) {
@@ -102,21 +96,21 @@ const Checkout = () => {
 
   const validateStep2 = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.cardNumber.trim()) {
       newErrors.cardNumber = 'Kart numarası zorunludur';
     } else if (formData.cardNumber.replace(/\s/g, '').length !== 16) {
       newErrors.cardNumber = '16 haneli kart numarası giriniz';
     }
-    
+
     if (!formData.cardName.trim()) newErrors.cardName = 'Kart üzerindeki isim zorunludur';
-    
+
     if (!formData.expiryDate.trim()) {
       newErrors.expiryDate = 'Son kullanma tarihi zorunludur';
     } else if (!/^\d{2}\/\d{2}$/.test(formData.expiryDate)) {
       newErrors.expiryDate = 'Geçerli bir son kullanma tarihi giriniz (AA/YY)';
     }
-    
+
     if (!formData.cvv.trim()) {
       newErrors.cvv = 'CVV zorunludur';
     } else if (formData.cvv.length !== 3) {
@@ -141,11 +135,10 @@ const Checkout = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (activeStep === 2 && validateStep2()) {
       setIsSubmitting(true);
-      
-      // Simüle edilmiş ödeme işlemi
+
       setTimeout(() => {
         setIsSubmitting(false);
         dispatch(clearCart());
@@ -154,7 +147,7 @@ const Checkout = () => {
     }
   };
 
-  if (cart.length === 0) {
+  if (!Array.isArray(cart) || cart.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8 text-center">
         <h1 className="text-2xl font-bold mb-4">Sepetiniz Boş</h1>
@@ -172,23 +165,23 @@ const Checkout = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-8 text-center">Ödeme</h1>
-      
+
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="lg:w-2/3">
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <div className="flex mb-6">
-              <div 
+              <div
                 className={`flex-1 pb-4 text-center border-b-2 ${activeStep === 1 ? 'border-blue-600 text-blue-600 font-medium' : 'border-gray-200'}`}
               >
                 1. Teslimat Bilgileri
               </div>
-              <div 
+              <div
                 className={`flex-1 pb-4 text-center border-b-2 ${activeStep === 2 ? 'border-blue-600 text-blue-600 font-medium' : 'border-gray-200'}`}
               >
                 2. Ödeme Bilgileri
               </div>
             </div>
-            
+
             <form onSubmit={handleSubmit}>
               {activeStep === 1 && (
                 <div className="space-y-4">
@@ -218,7 +211,7 @@ const Checkout = () => {
                       {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                     </div>
                   </div>
-                  
+
                   <div>
                     <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">E-posta</label>
                     <input
@@ -231,7 +224,7 @@ const Checkout = () => {
                     />
                     {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                   </div>
-                  
+
                   <div>
                     <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Adres</label>
                     <input
@@ -244,7 +237,7 @@ const Checkout = () => {
                     />
                     {errors.address && <p className="text-red-500 text-xs mt-1">{errors.address}</p>}
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">Şehir</label>
@@ -271,7 +264,7 @@ const Checkout = () => {
                       {errors.zipCode && <p className="text-red-500 text-xs mt-1">{errors.zipCode}</p>}
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end mt-6">
                     <button
                       type="button"
@@ -283,7 +276,7 @@ const Checkout = () => {
                   </div>
                 </div>
               )}
-              
+
               {activeStep === 2 && (
                 <div className="space-y-4">
                   <div>
@@ -299,7 +292,7 @@ const Checkout = () => {
                     />
                     {errors.cardNumber && <p className="text-red-500 text-xs mt-1">{errors.cardNumber}</p>}
                   </div>
-                  
+
                   <div>
                     <label htmlFor="cardName" className="block text-sm font-medium text-gray-700 mb-1">Kart Üzerindeki İsim</label>
                     <input
@@ -312,7 +305,7 @@ const Checkout = () => {
                     />
                     {errors.cardName && <p className="text-red-500 text-xs mt-1">{errors.cardName}</p>}
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label htmlFor="expiryDate" className="block text-sm font-medium text-gray-700 mb-1">Son Kullanma Tarihi</label>
@@ -342,7 +335,7 @@ const Checkout = () => {
                       {errors.cvv && <p className="text-red-500 text-xs mt-1">{errors.cvv}</p>}
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-between mt-6">
                     <button
                       type="button"
@@ -372,13 +365,13 @@ const Checkout = () => {
             </form>
           </div>
         </div>
-        
+
         <div className="lg:w-1/3">
           <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
             <h2 className="text-lg font-bold mb-4">Sipariş Özeti</h2>
-            
+
             <div className="space-y-4 mb-4">
-              {cart.map(item => (
+              {Array.isArray(cart) && cart.map(item => (
                 <div key={item.id} className="flex items-center">
                   <img src={item.image} alt={item.title} className="w-12 h-12 object-contain mr-3" />
                   <div className="flex-1">
@@ -391,7 +384,7 @@ const Checkout = () => {
                 </div>
               ))}
             </div>
-            
+
             <div className="border-t pt-4">
               <div className="flex justify-between mb-2">
                 <span>Ara Toplam</span>

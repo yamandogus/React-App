@@ -12,13 +12,13 @@ const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
   const dispatch = useDispatch();
   const { cart } = useSelector((state: RootState) => state.product);
   
-  const totalPrice = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  const totalPrice = Array.isArray(cart) ? cart.reduce((total, item) => total + item.price * item.quantity, 0) : 0;
 
   return (
     <div className={`fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-lg transform ${isOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out z-50`}>
       <div className="flex flex-col h-full">
         <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-bold">Sepetim ({cart.reduce((total, item) => total + item.quantity, 0)} Ürün)</h2>
+          <h2 className="text-xl font-bold">Sepetim ({Array.isArray(cart) ? cart.reduce((total, item) => total + item.quantity, 0) : 0} Ürün)</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -27,7 +27,7 @@ const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
         </div>
         
         <div className="flex-1 overflow-y-auto p-4">
-          {cart.length === 0 ? (
+          {!Array.isArray(cart) || cart.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -81,9 +81,11 @@ const CartSidebar = ({ isOpen, onClose }: CartSidebarProps) => {
           </div>
           <Link 
             to="/checkout" 
-            className={`w-full bg-blue-600 text-white py-3 rounded-md text-center block font-medium ${cart.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'}`}
-            onClick={() => {
-              if (cart.length > 0) {
+            className={`w-full bg-blue-600 text-white py-3 rounded-md text-center block font-medium ${!Array.isArray(cart) || cart.length === 0 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-700'}`}
+            onClick={(e) => {
+              if (!Array.isArray(cart) || cart.length === 0) {
+                e.preventDefault();
+              } else {
                 onClose();
               }
             }}

@@ -8,7 +8,7 @@ const Navbar = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { cart } = useSelector((state: RootState) => state.product);
   
-  const totalItems = cart.reduce((total, item) => total + item.quantity, 0);
+  const totalItems = Array.isArray(cart) ? cart.reduce((total, item) => total + item.quantity, 0) : 0;
 
   return (
     <>

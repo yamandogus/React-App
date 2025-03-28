@@ -24,11 +24,34 @@ interface ProductState {
   cart: CartItem[];
 }
 
+const getCartFromLocalStorage = (): CartItem[] => {
+  try {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      const parsedCart = JSON.parse(savedCart);
+      if (Array.isArray(parsedCart)) {
+        return parsedCart;
+      }
+    }
+  } catch (error) {
+    console.error('Sepet verileri çözümlenirken hata oluştu:', error);
+  }
+  return [];
+};
+
+const saveCartToLocalStorage = (cart: CartItem[]) => {
+  try {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  } catch (error) {
+    console.error('Sepet verileri kaydedilirken hata oluştu:', error);
+  }
+};
+
 const initialState: ProductState = {
   products: [],
   loading: false,
   error: null,
-  cart: [],
+  cart: getCartFromLocalStorage(),
 };
 
 export const fetchProducts = createAsyncThunk(
@@ -54,14 +77,18 @@ export const productSlice = createSlice({
       } else {
         state.cart.push({ ...action.payload, quantity: 1 });
       }
+      
+      saveCartToLocalStorage(state.cart);
     },
     removeFromCart: (state, action: PayloadAction<number>) => {
       state.cart = state.cart.filter(item => item.id !== action.payload);
+      saveCartToLocalStorage(state.cart);
     },
     increaseQuantity: (state, action: PayloadAction<number>) => {
       const item = state.cart.find(item => item.id === action.payload);
       if (item) {
         item.quantity += 1;
+        saveCartToLocalStorage(state.cart);
       }
     },
     decreaseQuantity: (state, action: PayloadAction<number>) => {
@@ -72,10 +99,12 @@ export const productSlice = createSlice({
         } else {
           item.quantity -= 1;
         }
+        saveCartToLocalStorage(state.cart);
       }
     },
     clearCart: (state) => {
       state.cart = [];
+      saveCartToLocalStorage(state.cart);
     }
   },
   extraReducers: (builder) => {
